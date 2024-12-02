@@ -1,0 +1,104 @@
+.navbar {
+    font-family: "Kanit", sans-serif;
+    background-color: rgba(51, 51, 51, 0.70);
+    height: initial;
+    /* - Position - */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    /* - Flex - */
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    z-index: 10;
+
+    @media screen and (width > 750px) {
+        justify-content: space-between;
+        flex-direction: row;
+        height: 5.5rem;
+    }
+
+    button {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+    }
+
+    div {
+        /* - Flex - */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        color: white;
+        font-weight: bold;
+        height: 100%;
+
+        @media screen and (width > 750px) {
+            flex-direction: row;
+        }
+
+        &:first-child {
+            flex-direction: row;
+            padding: 2vh 0;
+            justify-content: space-between;
+            width: 85%;
+
+            @media screen and (width > 750px) {
+                width: initial;
+                padding-left: 3vw;
+            }
+        }
+
+        &:last-child {
+            border-top: solid 2px #fff;
+            width: 100%;
+
+            @media screen and (width > 750px) {
+                border-top: none;
+                width: initial;
+                height: 100%;
+                padding-right: 3vw;
+            }
+        }
+    }
+
+    svg {
+        width: 40px;
+        height: 40px;
+        color: rgb(255, 225, 225);
+        cursor: pointer;
+
+        @media screen and (width > 750px) {
+            &:last-child {
+                display: none;
+            }
+        }
+    }
+
+    a {
+        /* - Flex - */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* - Text - */
+        text-decoration: none;
+        color: white;
+        font-size: 1rem;
+
+        padding: 3vh 0;
+        transition: all 0.6s ease;
+        width: 100%;
+
+        @media screen and (width > 750px) {
+            width: initial;
+            height: 100%;
+            padding: 0 3vw;
+        }
+
+        &:hover {
+            background-color: rgba(51, 51, 51, 0.80);
+        }
+    }
+}
