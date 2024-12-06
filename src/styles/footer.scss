@@ -1,0 +1,81 @@
+footer {
+    padding: 7vh 0 5vh 0;
+    font-family: "Kanit", sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 4rem;
+    margin-top: 5vh;
+    margin-bottom: 10vh;
+    background-color: rgba(0, 0, 0, 0.11);
+
+    h3 {
+        font-size: 2rem;
+        font-weight: 500;
+        margin: 0;
+        text-decoration: underline;
+        text-wrap: balance;
+    }
+
+    iframe {
+        width: 70vw;
+        height: 50vh;
+        border: none;
+        box-shadow: #000 0px 0px 5px;
+    }
+}
+
+footer .links {
+
+    ul {
+        max-width: fit-content;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        max-width: 60vw;
+        width: fit-content;
+        margin: 0;
+        gap: 3rem;
+        justify-content: center;
+        padding: 0 !important;
+    }
+
+    ul li {
+        text-decoration: none;
+        list-style: none;
+        max-width: fit-content;
+    }
+
+    ul li a {
+        text-decoration: none;
+        color: #1b1b1b;
+        display: flex;
+        flex-direction: row;
+        gap: .5rem;
+        text-align: center;
+        align-items: center;
+
+        @media screen and (width < 750px) {
+            flex-direction: column;
+        }
+    }
+
+    ul li a span {
+        font-size: 1.5rem;
+    }
+
+    ul li a svg {
+        width: 2rem;
+        height: 2rem;
+
+    }
+
+    @media screen and (max-width: 700px) {
+        ul li a span {
+            font-size: 1.2rem;
+        }
+    }
+
+}

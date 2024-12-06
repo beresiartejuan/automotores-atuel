@@ -1,21 +1,33 @@
 ---
+import "normalize.css";
+import "../styles/main.scss";
 import Head from "../components/Head.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+import { SITEWEB_DESCRIPTION, SITEWEB_TITLE } from "../config";
 
 interface Props {
-	title: string;
-	description: string;
+	title?: string;
+	description?: string;
+	showBanner?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, showBanner } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="es">
 	<head>
-		<Head title={title} description={description} />
+		<Head
+			title={title ?? SITEWEB_TITLE}
+			description={description ?? SITEWEB_DESCRIPTION}
+		/>
 	</head>
-	<body>
+	<body class=`${showBanner == false ? 'space-top' : ''}`>
+		<Header showBanner={showBanner ?? true} />
 		<slot />
+		<Footer />
 	</body>
 </html>
 
@@ -25,5 +37,9 @@ const { title, description } = Astro.props;
 		margin: 0;
 		width: 100%;
 		height: 100%;
+	}
+
+	body.space-top {
+		padding-top: 15vh !important;
 	}
 </style>

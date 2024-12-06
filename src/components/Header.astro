@@ -1,0 +1,21 @@
+---
+import Navbar from "./Navbar.astro";
+
+interface Props {
+    showBanner: boolean;
+}
+
+const { showBanner } = Astro.props;
+---
+
+<Navbar />
+{
+    showBanner ? (
+        <header>
+            <div class="banner">
+                <span>Grandes oportunidades, cerca de casa.</span>
+                <a href="">Visitanos</a>
+            </div>
+        </header>
+    ) : null
+}
