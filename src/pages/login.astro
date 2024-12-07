@@ -1,9 +1,5 @@
 ---
 import Navbar from "../components/Navbar.astro";
-
-if (Astro.cookies.has("authenticated")) {
-    return Astro.redirect("/panel");
-}
 ---
 
 <!doctype html>
