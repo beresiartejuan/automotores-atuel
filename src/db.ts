@@ -5,6 +5,10 @@ export const turso = createClient({
     authToken: process.env.TURSO_AUTH_TOKEN!,
 });
 
+export const getCarsWithFilters = async (filter: string) => {
+    return (await turso.execute("SELECT * FROM cars WHERE published = 1" + ` AND ${filter}`)).rows;
+}
+
 export const getAllPublishedCars = async () => {
     return (await turso.execute("SELECT * FROM cars WHERE published = 1")).rows;
 }

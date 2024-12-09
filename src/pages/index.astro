@@ -3,7 +3,6 @@ import Layout from "../layouts/Layout.astro";
 import SearchBar from "../components/SearchBar.astro";
 import CarCard from "../components/CarCard.astro";
 import { getAllPublishedCars } from "../db";
-import type { Car } from "../config";
 
 const cars = await getAllPublishedCars();
 ---

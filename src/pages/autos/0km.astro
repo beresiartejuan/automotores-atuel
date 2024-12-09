@@ -1,1 +1,48 @@
-0km
+---
+import Layout from "../../layouts/Layout.astro";
+import CarCard from "../../components/CarCard.astro";
+import { getCarsWithFilters } from "../../db";
+
+const cars = await getCarsWithFilters("is_used = 0");
+---
+
+<Layout>
+    <h3>Encontrá tu próximo auto con nosotros</h3>
+    <section class="cards">
+        {
+            cars.map((car) => (
+                <CarCard
+                    name={car.name as string}
+                    year={car.year as number}
+                    isUsed={car.is_used == 0 ? false : true}
+                    mileage={car.mileage as string}
+                    model={car.model as string}
+                    id={car.id as string}
+                />
+            ))
+        }
+    </section>
+</Layout>
+
+<style>
+    h3 {
+        max-width: fit-content;
+        margin: 0 auto;
+        font-family: "Kanit", sans-serif;
+        font-weight: 600;
+        font-size: 2.5rem;
+        margin-top: 8vh;
+        text-align: center;
+        text-wrap: balance;
+    }
+    .cards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        max-width: 90%;
+        width: fit-content;
+        justify-content: flex-start;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+</style>

@@ -1,0 +1,219 @@
+---
+import { turso } from "../../../db";
+import Layout from "../../../layouts/Layout.astro";
+
+// Obtener el id del auto desde los parámetros
+const { id } = Astro.params;
+
+if (!id) {
+    return Astro.redirect("/");
+}
+
+// Consultar información del auto y la primera imagen
+const { rows: carRows } = await turso.execute({
+    sql: `
+    SELECT * FROM cars WHERE id = ?;
+  `,
+    args: [id],
+});
+
+if (carRows.length === 0) {
+    return Astro.redirect("/404");
+}
+
+const { rows: carInfoRows } = await turso.execute({
+    sql: `
+    SELECT * FROM car_info WHERE car_id = ?;
+  `,
+    args: [id],
+});
+
+const { rows: photos } = await turso.execute({
+    sql: `
+    SELECT photo_url FROM car_photos WHERE car_id = ? ORDER BY id ASC;
+  `,
+    args: [id],
+});
+
+const car = carRows[0];
+const carInfo = carInfoRows[0];
+const firstPhoto = photos.length ? photos[0].photo_url : null;
+
+const tags = [
+    {
+        condition: carInfo.parking_assist,
+        label: "Asistente de Estacionamiento",
+    },
+    { condition: carInfo.push_button_start, label: "Botón de Arranque" },
+    { condition: carInfo.remote_locking, label: "Cierre a Distancia" },
+    { condition: carInfo.connectivity, label: "Conectividad" },
+    { condition: carInfo.satellite_navigation, label: "Navegador Satelital" },
+    { condition: carInfo.screens, label: "Pantallas" },
+    { condition: carInfo.panoramic_roof, label: "Techo Panorámico" },
+    { condition: carInfo.air_conditioning, label: "Aire Acondicionado" },
+    { condition: carInfo.fog_lights, label: "Faros Antiniebla" },
+    { condition: carInfo.bluetooth, label: "Bluetooth" },
+].filter((item) => item.condition);
+---
+
+<Layout>
+    <section class="car-detail">
+        <div class="car-header">
+            <h1>{car.name} ({car.year})</h1>
+            {
+                firstPhoto && (
+                    <img
+                        src={firstPhoto as string}
+                        alt={`Foto de ${car.name}`}
+                        class="car-image"
+                    />
+                )
+            }
+        </div>
+
+        <section class="car-info">
+            <h2>Información del Auto</h2>
+            <ul>
+                <li><strong>Modelo:</strong> {car.model}</li>
+                <li><strong>Precio:</strong> ${car.price}</li>
+                <li><strong>Descripción:</strong> {car.description}</li>
+                <li>
+                    <strong>Usado:</strong>
+                    {car.is_used === 1 ? "Sí" : "No"}
+                </li>
+                <li>
+                    <strong>Publicado:</strong>
+                    {car.published === 1 ? "Sí" : "No"}
+                </li>
+            </ul>
+        </section>
+
+        <section class="car-tech">
+            <h2>Ficha Técnica</h2>
+            <ul>
+                <li><strong>Kilometraje:</strong> {carInfo.mileage}</li>
+                <li><strong>Tracción:</strong> {carInfo.traction}</li>
+                <li>
+                    <strong>Tipo de Combustible:</strong>
+                    {carInfo.fuel_type}
+                </li>
+                <li>
+                    <strong>Transmisión:</strong>
+                    {carInfo.transmission_type}
+                </li>
+                <li>
+                    <strong>Capacidad del Tanque:</strong>
+                    {carInfo.fuel_tank_capacity_liters} L
+                </li>
+                <li><strong>Tipo de Motor:</strong> {carInfo.engine_type}</li>
+            </ul>
+        </section>
+
+        <section class="car-features">
+            <h2>Características</h2>
+            <ul>
+                {tags.map((item) => <li>{item.label}</li>)}
+            </ul>
+        </section>
+
+        <section>
+            <h2>Fotos</h2>
+            {
+                photos.map((photo) => (
+                    <img
+                        src={photo.photo_url as unknown as string}
+                        alt={`Foto de ${car.name}`}
+                        class="car-image"
+                    />
+                ))
+            }
+        </section>
+    </section>
+
+    <style>
+        .car-detail {
+            font-family: "Arial", sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .car-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .car-header h1 {
+            font-size: 3rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .car-image {
+            width: 100%;
+            max-width: 400px;
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+
+        .car-info,
+        .car-tech,
+        .car-features {
+            margin-bottom: 20px;
+        }
+
+        .car-info h2,
+        .car-tech h2,
+        .car-features h3 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 8px;
+            font-size: 1rem;
+            color: #666;
+        }
+
+        strong {
+            color: #333;
+        }
+
+        .car-features ul {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .car-features li {
+            background-color: #e0e0e0;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .car-detail {
+                padding: 15px;
+            }
+
+            .car-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .car-image {
+                max-width: 100%;
+            }
+        }
+    </style>
+</Layout>

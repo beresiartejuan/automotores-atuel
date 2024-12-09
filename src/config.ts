@@ -1,4 +1,4 @@
-export const SITEWEB_TITLE = "Automotores Atuel";
+export const SITEWEB_TITLE = "Automoviles Atuel";
 export const SITEWEB_DESCRIPTION = "Grandes oportunidades, cerca de casa.";
 
 export type Car = {
