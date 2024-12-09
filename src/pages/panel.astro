@@ -1,6 +1,8 @@
 ---
 import jwt from "jsonwebtoken";
 import Layout from "../layouts/Layout.astro";
+import { getAllCars } from "../db";
+import SimpleCarCard from "../components/SimpleCarCard.astro";
 
 const userCookie = Astro.cookies.get("authenticated");
 
@@ -9,6 +11,7 @@ if (!userCookie) {
 }
 
 let user;
+
 try {
     user = jwt.verify(userCookie.value, process.env.PRIVATE_KEY as string) as {
         name: string;
@@ -18,6 +21,8 @@ try {
     console.error("Error al verificar el token:", error);
     return Astro.redirect("/login");
 }
+
+const cars = await getAllCars();
 ---
 
 <Layout showBanner={false}>
@@ -29,6 +34,20 @@ try {
                 >Registrar un nuevo vehículo</button
             >
             <div id="response-box" style="margin-top: 20px;"></div>
+        </section>
+        <section class="simple-cards">
+            {
+                cars.map((car) => (
+                    <SimpleCarCard
+                        id={car.id as string}
+                        name={car.name as string}
+                        model={car.model as string}
+                        year={car.year as number}
+                        price={car.price as number}
+                        description={car.description as string}
+                    />
+                ))
+            }
         </section>
     </main>
 
@@ -88,7 +107,7 @@ try {
     </script>
 </Layout>
 
-<style>
+<style lang="scss">
     .panel {
         max-width: 800px;
         margin: 0 auto;
@@ -117,5 +136,11 @@ try {
 
     button:hover {
         background: #0056b3;
+    }
+
+    .simple-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
     }
 </style>

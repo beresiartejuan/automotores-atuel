@@ -70,6 +70,10 @@ import Navbar from "../components/Navbar.astro";
                     responseMessage.textContent =
                         data.message || "Inicio de sesión exitoso";
                     responseMessage.style.color = "green";
+
+                    setTimeout(() => {
+                        window.location.href = "/panel";
+                    }, 500);
                 } else {
                     const errorData = await response.json();
                     responseMessage.textContent =

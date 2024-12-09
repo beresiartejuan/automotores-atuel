@@ -1,0 +1,489 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import { turso } from "../../../db";
+
+const id = Astro.params.id;
+
+const userCookie = Astro.cookies.get("authenticated");
+
+if (!userCookie) {
+    return Astro.redirect("/login");
+}
+
+if (!id) {
+    return Astro.redirect("/404");
+}
+
+const { rows: carRows } = await turso.execute({
+    sql: `SELECT * FROM cars WHERE id = ?`,
+    args: [id],
+});
+
+const { rows: carInfoRows } = await turso.execute({
+    sql: `SELECT * FROM car_info WHERE car_id = ?`,
+    args: [id],
+});
+
+const { rows: photos } = await turso.execute({
+    sql: `SELECT * FROM car_photos WHERE car_id = ?`,
+    args: [id],
+});
+
+if (carRows.length === 0) {
+    return Astro.redirect("/404");
+}
+
+const car = carRows[0];
+const carInfo = carInfoRows[0];
+---
+
+<Layout showBanner={false}>
+    <!-- Formulario de edición -->
+    <h1>Editar Auto</h1>
+
+    <form car-id={car.id}>
+        <fieldset>
+            <legend>Información del Auto</legend>
+            <label>
+                Nombre:
+                <input
+                    type="text"
+                    name="name"
+                    value={car.name as string}
+                    required
+                />
+            </label>
+
+            <label>
+                Modelo:
+                <input
+                    type="text"
+                    name="model"
+                    value={car.model as string}
+                    required
+                />
+            </label>
+
+            <label>
+                Precio:
+                <input
+                    type="number"
+                    name="price"
+                    step="0.01"
+                    value={car.price as string}
+                    required
+                />
+            </label>
+
+            <label>
+                Descripción:
+                <textarea name="description" required
+                    >{car.description}</textarea
+                >
+            </label>
+
+            <label>
+                Año:
+                <input
+                    type="number"
+                    name="year"
+                    value={car.year as string}
+                    required
+                />
+            </label>
+
+            <label>
+                ¿Usado?
+                <input
+                    type="checkbox"
+                    name="is_used"
+                    checked={car.is_used ? "checked" : ""}
+                />
+            </label>
+
+            <label>
+                ¿Publicado?
+                <input
+                    type="checkbox"
+                    name="published"
+                    checked={car.published ? "checked" : ""}
+                />
+            </label>
+        </fieldset>
+
+        <fieldset>
+            <legend>Información Técnica</legend>
+
+            <label>
+                Kilometraje:
+                <input
+                    type="text"
+                    name="mileage"
+                    value={carInfo.mileage as string}
+                    required
+                />
+            </label>
+
+            <label>
+                Tracción:
+                <input
+                    type="text"
+                    name="traction"
+                    value={carInfo.traction as string}
+                    required
+                />
+            </label>
+
+            <label>
+                Tipo de Combustible:
+                <input
+                    type="text"
+                    name="fuel_type"
+                    value={carInfo.fuel_type as string}
+                    required
+                />
+            </label>
+
+            <label>
+                Transmisión:
+                <input
+                    type="text"
+                    name="transmission_type"
+                    value={carInfo.transmission_type as string}
+                    required
+                />
+            </label>
+
+            <label>
+                Capacidad del Tanque (L):
+                <input
+                    type="number"
+                    name="fuel_tank_capacity_liters"
+                    value={carInfo.fuel_tank_capacity_liters as string}
+                    required
+                />
+            </label>
+
+            <label>
+                Tipo de Motor:
+                <input
+                    type="text"
+                    name="engine_type"
+                    value={carInfo.engine_type as string}
+                    required
+                />
+            </label>
+
+            <h3>Características</h3>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="parking_assist"
+                    checked={carInfo.parking_assist ? "checked" : ""}
+                />
+                Asistente de Estacionamiento
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="push_button_start"
+                    checked={carInfo.push_button_start ? "checked" : ""}
+                />
+                Botón de Arranque
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="remote_locking"
+                    checked={carInfo.remote_locking ? "checked" : ""}
+                />
+                Cierre a Distancia
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="connectivity"
+                    checked={carInfo.connectivity ? "checked" : ""}
+                />
+                Conectividad
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="satellite_navigation"
+                    checked={carInfo.satellite_navigation ? "checked" : ""}
+                />
+                Navegador Satelital
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="screens"
+                    checked={carInfo.screens ? "checked" : ""}
+                />
+                Pantallas
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="panoramic_roof"
+                    checked={carInfo.panoramic_roof ? "checked" : ""}
+                />
+                Techo Panorámico
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="air_conditioning"
+                    checked={carInfo.air_conditioning ? "checked" : ""}
+                />
+                Aire Acondicionado
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="fog_lights"
+                    checked={carInfo.fog_lights ? "checked" : ""}
+                />
+                Faros Antiniebla
+            </label>
+
+            <label>
+                <input
+                    type="checkbox"
+                    name="bluetooth"
+                    checked={carInfo.bluetooth ? "checked" : ""}
+                />
+                Bluetooth
+            </label>
+        </fieldset>
+
+        <fieldset id="photos-container">
+            <legend>Fotos</legend>
+
+            {
+                photos.map((photo, index) => (
+                    <label>
+                        Foto {index + 1}
+                        <input
+                            type="text"
+                            name="photo_url[]"
+                            value={photo.photo_url as string}
+                        />
+                    </label>
+                ))
+            }
+            <p class="note">Para borrar una imagen deje el campo vacio.</p>
+            <button type="button" id="add-photo-btn">Agregar Foto</button>
+        </fieldset>
+
+        <button type="submit">Guardar Cambios</button>
+    </form>
+</Layout>
+<script>
+    const addPhotoBtn = document.getElementById("add-photo-btn")!;
+    const form = document.querySelector("form[car-id]") as HTMLFormElement;
+
+    // Suponiendo que ya conoces el ID del auto
+    const carId = form.getAttribute("car-id")!;
+
+    // Función para agregar una nueva foto
+    async function addPhoto() {
+        try {
+            const response = await fetch(`/api/autos/${carId}/nueva_foto`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Error al agregar la foto");
+            }
+
+            window.location.reload();
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error al agregar la foto.");
+        }
+    }
+
+    // Asigna el evento de clic al botón
+    addPhotoBtn.addEventListener("click", addPhoto);
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        try {
+            const response = await fetch(`/api/autos/${carId}/edit`, {
+                method: "POST",
+                body: formData,
+            });
+
+            if (response.ok) {
+                alert("Auto actualizado correctamente");
+                window.location.reload(); // Actualiza la página
+            } else {
+                alert("Error al actualizar el auto");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error al actualizar el auto");
+        }
+    });
+</script>
+<style lang="scss">
+    // Variables de color
+    $background-dark: #2c2c2c;
+    $text-light: #f1f1f1;
+    $input-bg: #444;
+    $border-dark: #666;
+    $primary-color: #1e90ff;
+    $primary-hover: #187bcd;
+
+    // Formulario
+    form {
+        background-color: $background-dark;
+        color: $text-light;
+        border-radius: 8px;
+        padding: 20px;
+        width: 100%;
+        max-width: 600px;
+        margin: 30px auto;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+
+        @media (max-width: 800px) {
+            padding: 15px;
+            max-width: 90%;
+        }
+    }
+
+    // Campos de entrada
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+        background-color: $input-bg;
+        color: $text-light;
+        border: 1px solid $border-dark;
+        padding: 10px;
+        border-radius: 4px;
+        width: 100%;
+        margin-bottom: 12px;
+        box-sizing: border-box;
+        font-size: 14px;
+
+        &:focus {
+            border-color: $primary-color;
+            outline: none;
+        }
+    }
+
+    // Botones
+    button {
+        background-color: $primary-color;
+        color: #fff;
+        padding: 12px 20px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+        width: 100%;
+
+        &:hover {
+            background-color: $primary-hover;
+        }
+    }
+
+    // Etiquetas y encabezados
+    h1,
+    h3,
+    legend {
+        color: $text-light;
+        margin-bottom: 16px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    // Contenedor de fieldset
+    fieldset {
+        border: 1px solid $border-dark;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        background-color: $background-dark;
+
+        @media (max-width: 800px) {
+            padding: 10px;
+        }
+    }
+
+    legend {
+        font-weight: bold;
+    }
+
+    // Casillas de verificación
+    input[type="checkbox"] {
+        margin-right: 8px;
+        accent-color: $primary-color;
+
+        &:checked {
+            background-color: $primary-color;
+            border-color: $primary-color;
+        }
+    }
+
+    // Notas
+    .note {
+        padding: 0;
+        margin: 0;
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+
+    // Media Queries para Pantallas Pequeñas
+    @media (max-width: 800px) {
+        form {
+            padding: 10px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            font-size: 13px;
+            padding: 8px;
+        }
+
+        button {
+            font-size: 14px;
+            padding: 10px;
+        }
+
+        label {
+            font-size: 13px;
+        }
+
+        h1,
+        h3,
+        legend {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+    }
+</style>
