@@ -10,6 +10,21 @@ interface Props {
 
 const { name, model, year, isUsed, mileage, id } = Astro.props;
 const mileageText = isUsed ? mileage : "0km";
+
+import { turso } from "../db";
+
+const { rows: photos } = await turso.execute({
+    sql: `
+        SELECT photo_url 
+        FROM car_photos 
+        WHERE car_id = ? 
+        ORDER BY id ASC 
+        LIMIT 1;
+    `,
+    args: [id],
+});
+
+const firstPhoto = photos.length ? photos[0].photo_url : "/auto.jpg";
 ---
 
 <div
@@ -20,7 +35,7 @@ const mileageText = isUsed ? mileage : "0km";
 >
     <div class="card__image">
         <img
-            src="/auto.jpg"
+            src={firstPhoto as string}
             alt={`Imagen de ${name}, modelo ${model}`}
             loading="lazy"
         />
@@ -72,7 +87,6 @@ const mileageText = isUsed ? mileage : "0km";
         border-radius: var(--border-radius);
         box-shadow: 0 4px 10px var(--color-shadow);
         max-width: 18rem;
-        margin: 0 auto;
         overflow: hidden;
         // cursor: pointer;
         transition:

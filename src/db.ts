@@ -6,7 +6,7 @@ export const turso = createClient({
 });
 
 export const getAllPublishedCars = async () => {
-    return (await turso.execute("SELCT * FROM cars WHERE published = 1")).rows;
+    return (await turso.execute("SELECT * FROM cars WHERE published = 1")).rows;
 }
 
 export const getAllCars = async () => {

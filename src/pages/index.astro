@@ -2,16 +2,39 @@
 import Layout from "../layouts/Layout.astro";
 import SearchBar from "../components/SearchBar.astro";
 import CarCard from "../components/CarCard.astro";
+import { getAllPublishedCars } from "../db";
+import type { Car } from "../config";
+
+const cars = await getAllPublishedCars();
 ---
 
 <Layout>
     <SearchBar />
-    <CarCard
-        name="Peugeot 207"
-        year={2016}
-        isUsed={false}
-        mileage="0km"
-        model="Compact 1.4 5 P Xsallure"
-        id="bidybwyebyihn"
-    />
+    <section class="cards">
+        {
+            cars.map((car) => (
+                <CarCard
+                    name={car.name as string}
+                    year={car.year as number}
+                    isUsed={car.is_used == 0 ? false : true}
+                    mileage={car.mileage as string}
+                    model={car.model as string}
+                    id={car.id as string}
+                />
+            ))
+        }
+    </section>
 </Layout>
+
+<style>
+    .cards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        max-width: 90%;
+        width: fit-content;
+        justify-content: flex-start;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+</style>
