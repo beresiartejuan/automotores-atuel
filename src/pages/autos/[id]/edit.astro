@@ -38,9 +38,6 @@ const carInfo = carInfoRows[0];
 ---
 
 <Layout showBanner={false}>
-    <!-- Formulario de edición -->
-    <h1>Editar Auto</h1>
-
     <form car-id={car.id}>
         <fieldset>
             <legend>Información del Auto</legend>
@@ -282,11 +279,23 @@ const carInfo = carInfoRows[0];
                     </label>
                 ))
             }
-            <p class="note">Para borrar una imagen deje el campo vacio.</p>
+            <p class="note">
+                Para borrar una imagen deje el campo vacio. Utiliza <a
+                    href="https://imgbb.com/">ImgBB</a
+                >.
+            </p>
             <button type="button" id="add-photo-btn">Agregar Foto</button>
         </fieldset>
 
         <button type="submit">Guardar Cambios</button>
+        <button
+            type="button"
+            name="show_public_car"
+            style="margin-top: 10px;"
+            onclick=`javascript:location.href='/autos/${car.id}'`
+            >Ver Auto</button
+        >
+        <button type="button" id="delete-btn">Eliminar auto</button>
     </form>
 </Layout>
 <script>
@@ -341,15 +350,44 @@ const carInfo = carInfoRows[0];
             alert("Error al actualizar el auto");
         }
     });
+
+    document
+        .getElementById("delete-btn")!
+        .addEventListener("click", async function () {
+            try {
+                // Enviar la solicitud POST para eliminar el auto
+                const response = await fetch(`/api/autos/${carId}/delete`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                // Verificar si la respuesta es exitosa
+                if (response.ok) {
+                    // Redirigir al panel si la eliminación fue exitosa
+                    window.location.href = "/panel";
+                } else {
+                    // Manejar el error en caso de que la eliminación falle
+                    const errorData = await response.json();
+                    alert(
+                        `Error al eliminar el auto: ${errorData.message || "Error desconocido"}`,
+                    );
+                }
+            } catch (error) {
+                console.error("Error de red:", error);
+                alert("Hubo un error al procesar la solicitud.");
+            }
+        });
 </script>
 <style lang="scss">
     // Variables de color
-    $background-dark: #2c2c2c;
-    $text-light: #f1f1f1;
-    $input-bg: #444;
-    $border-dark: #666;
-    $primary-color: #1e90ff;
-    $primary-hover: #187bcd;
+    $background-dark: #ffffff; // Fondo claro
+    $text-light: #2c2c2c; // Texto oscuro
+    $input-bg: #f0f0f0; // Fondo de entrada claro
+    $border-dark: #cccccc; // Borde claro
+    $primary-color: #007bff; // Azul primario
+    $primary-hover: #0056b3; // Azul más oscuro al hacer hover
 
     // Formulario
     form {
@@ -382,6 +420,8 @@ const carInfo = carInfoRows[0];
         margin-bottom: 12px;
         box-sizing: border-box;
         font-size: 14px;
+        margin-top: 8px;
+        font-weight: 400;
 
         &:focus {
             border-color: $primary-color;
@@ -418,6 +458,7 @@ const carInfo = carInfoRows[0];
         display: block;
         margin-bottom: 8px;
         font-size: 14px;
+        font-weight: 600;
     }
 
     // Contenedor de fieldset
