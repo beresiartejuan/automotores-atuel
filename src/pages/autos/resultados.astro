@@ -1,0 +1,62 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import CarCard from "../../components/CarCard.astro";
+import SearchBar from "../../components/SearchBar.astro";
+import { turso } from "../../db";
+
+const url = new URL(Astro.url);
+const searchTerm = url.searchParams.get("term")?.toLowerCase() || "";
+const status = url.searchParams.get("status") || "new";
+
+const { rows: cars } = await turso.execute({
+    sql: `
+        SELECT * 
+        FROM cars 
+        WHERE is_used = ? 
+        AND (LOWER(name) LIKE ? OR LOWER(model) LIKE ?)
+        ORDER BY name ASC
+    `,
+    args: [status === "new" ? 0 : 1, `%${searchTerm}%`, `%${searchTerm}%`],
+});
+---
+
+<Layout>
+    <SearchBar />
+    <section class="cards">
+        {
+            cars.map((car) => (
+                <CarCard
+                    name={car.name as string}
+                    year={car.year as number}
+                    isUsed={car.is_used == 0 ? false : true}
+                    mileage={car.mileage as string}
+                    model={car.model as string}
+                    id={car.id as string}
+                />
+            ))
+        }
+    </section>
+</Layout>
+
+<style>
+    h3 {
+        max-width: fit-content;
+        margin: 0 auto;
+        font-family: "Kanit", sans-serif;
+        font-weight: 600;
+        font-size: 2.5rem;
+        margin-top: 8vh;
+        text-align: center;
+        text-wrap: balance;
+    }
+    .cards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        max-width: 90%;
+        width: fit-content;
+        justify-content: flex-start;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+</style>

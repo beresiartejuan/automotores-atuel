@@ -1,14 +1,68 @@
 <h3>Encontra el auto perfecto para vos</h3>
 <section>
     <div class="buttons">
-        <button class="selected">0km</button>
-        <button>Usados</button>
+        <button id="new-btn">0km</button>
+        <button id="used-btn">Usados</button>
     </div>
-    <input type="text" placeholder="Escribí la marca o modelo del auto..." />
-    <button>Buscar</button>
+    <input
+        id="search-input"
+        type="text"
+        placeholder="Escribí la marca o modelo del auto..."
+    />
+    <button id="search-btn">Buscar</button>
 </section>
 
-<script></script>
+<script>
+    function getQueryParam(param: string) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param) || "";
+    }
+
+    let carStatus = getQueryParam("status") || "new";
+    const searchTerm = getQueryParam("term");
+
+    (document.querySelector("#search-input") as HTMLInputElement).value =
+        searchTerm;
+
+    if (carStatus == "new") {
+        document.querySelector("#new-btn")?.classList.add("selected");
+    } else {
+        document.querySelector("#used-btn")?.classList.add("selected");
+    }
+
+    // Cambiar entre botones de estado
+    document.getElementById("new-btn")!.addEventListener("click", () => {
+        carStatus = "new";
+        toggleSelected("new-btn", "used-btn");
+    });
+
+    document.getElementById("used-btn")!.addEventListener("click", () => {
+        carStatus = "used";
+        toggleSelected("used-btn", "new-btn");
+    });
+
+    // Buscar autos al hacer clic
+    document.getElementById("search-btn")!.addEventListener("click", () => {
+        const searchTerm = (
+            document.getElementById("search-input") as HTMLInputElement
+        ).value
+            .trim()
+            .toLowerCase();
+
+        if (searchTerm === "") {
+            alert("Por favor, escribí una marca o modelo.");
+            return;
+        }
+
+        window.location.href = `/autos/resultados?status=${carStatus}&term=${encodeURIComponent(searchTerm)}`;
+    });
+
+    // Función para alternar clases de botones
+    function toggleSelected(selectedId: string, otherId: string) {
+        document.getElementById(selectedId)!.classList.add("selected");
+        document.getElementById(otherId)!.classList.remove("selected");
+    }
+</script>
 
 <style lang="scss">
     $padding: 0.8rem 2rem;
